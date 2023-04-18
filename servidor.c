@@ -8,7 +8,7 @@
 
 #define PORT 12345 // Puerto del servidor
 #define MAX_CONNECTIONS 5 // Máximo número de conexiones simultáneas
-#define MAX_BUFFER_SIZE 256 // Tamaño máximo del buffer de lectura/escritura
+#define MAX_BUFFER_SIZE 1024 // Tamaño máximo del buffer de lectura/escritura
 
 //Deinimos nuestros precios(Tomados de referencia de cinepolis)
 #define PRICE_ADULT 75
@@ -137,26 +137,7 @@ void sell_ticket(Sala *salas, int num_sala, int num_horario, int client_socket) 
         strcpy(buffer, "No hay cupos disponibles para ese horario\n");
         return;
     }
-
-    // Disponibilidad de asientos
-    strcat(buffer, "Asientos:\n"
-                   "└┘->Numero = Disponibles\n"
-                   "└┘->/ = Ocupados\n");
-    for (int asiento = 0; asiento < 10; asiento++) {
-            if (sala->asientos[num_horario][asiento] == 0) {
-                char a[11];
-                snprintf(a, sizeof(a), "└┘->%d", asiento+1);
-                strcat(buffer,a);
-            } else if (sala->asientos[num_horario][asiento] == 1) {
-                char a[11];
-                snprintf(a,sizeof(a), "└┘->/");
-                strcat(buffer,a);
-            }
-        strcat(buffer, "    ");
-    }
-    strcat(buffer, "\n");
-    send(client_socket, buffer, strlen(buffer), 0);
-    
+ 
     puente = recv(client_socket, buffer, MAX_BUFFER_SIZE, 0);
     buffer[puente] = '\0';
     sscanf(buffer, "%d", &num_asientos);
@@ -209,19 +190,33 @@ void sell_ticket(Sala *salas, int num_sala, int num_horario, int client_socket) 
         num_children += num_chavos;
         num_old += num_viejos;
     }
+    
+    
+    // Disponibilidad de asientos
+    char buffer_a[MAX_BUFFER_SIZE] = "\0";
+    for (int asiento = 0; asiento < 10; asiento++) {
+            if (sala->asientos[num_horario][asiento] == 0) {
+                char a[11];
+                snprintf(a, sizeof(a), "└┘->%d  ", asiento+1);
+                strcat(buffer_a,a);
+            } else if (sala->asientos[num_horario][asiento] == 1) {
+                char a[11];
+                snprintf(a,sizeof(a), "└┘->/  ");
+                strcat(buffer_a,a);
+            }
+    }
+    strcat(buffer_a, "\n");
+    send(client_socket, buffer_a, strlen(buffer_a), 0);
 
 
     for (int i = 0; i < num_asientos; i++) {
         int asiento = 0;
-       /* snprintf(buffer, b, "Ingrese el número del asiento %d: \n", i + 1);
-        strcat(buffer,b);*/
-
         puente = recv(client_socket, buffer, MAX_BUFFER_SIZE, 0);
         buffer[puente] = '\0';
         sscanf(buffer, "%d", &asiento);
 
         
-        if (asiento < 0 || asiento > 10 || sala->asientos[num_horario][asiento] == 1) {
+        if (asiento < 0 || asiento > 10 || sala->asientos[num_horario][asiento-1] == 1) {
             strcpy(buffer, "Invalido, escoga otro asiento\n");
             i--;
         } else {

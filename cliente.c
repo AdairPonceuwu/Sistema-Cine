@@ -82,10 +82,6 @@ int main()
             snprintf(buffer, MAX_BUFFER_SIZE, "%d", n_horario);
             send(socket_c, buffer, strlen(buffer), 0);
 
-            puente = recv(socket_c, buffer, MAX_BUFFER_SIZE, 0);
-            buffer[puente] = '\0';
-            printf("%s", buffer);
-
             //Asientos
             printf("Cantidad de asientos a escoger: ");
             scanf("%d", &n_asientos);
@@ -107,16 +103,25 @@ int main()
             scanf("%d", &n_asientos_v);
             snprintf(buffer, MAX_BUFFER_SIZE, "%d", n_asientos_v);
             send(socket_c, buffer, strlen(buffer), 0);
+
+            
+            printf("Asientos:\n"
+                   "└┘->Numero = Disponibles\n"
+                   "└┘->/ = Ocupados\n");
+            puente = recv(socket_c, buffer, MAX_BUFFER_SIZE, 0);
+            buffer[puente] = '\0';
+            printf("%s", buffer);
+            printf("Digite el número del asiento que desee:\n");
             for(int i=0;i<n_asientos;i++){
                 //Digite la cantidad de asientos
-                printf("Esperando n.asiento: ");
+                printf("Esperando el asiento n.%d:", i+1);
                 scanf("%d", &n_asiento);
                 snprintf(buffer, MAX_BUFFER_SIZE, "%d", n_asiento);
                 send(socket_c, buffer, strlen(buffer), 0);
+            }
                 puente = recv(socket_c, buffer, MAX_BUFFER_SIZE, 0);
                 buffer[puente] = '\0';
                 printf("%s", buffer);
-            }
         }
 
         //Finalizar el sistema
