@@ -208,22 +208,26 @@ void sell_ticket(Sala *salas, int num_sala, int num_horario, int client_socket) 
     strcat(buffer_a, "\n");
     send(client_socket, buffer_a, strlen(buffer_a), 0);
 
-
+    char buffer_asiento[MAX_BUFFER_SIZE] = "\0";
     for (int i = 0; i < num_asientos; i++) {
         int asiento = 0;
         puente = recv(client_socket, buffer, MAX_BUFFER_SIZE, 0);
         buffer[puente] = '\0';
         sscanf(buffer, "%d", &asiento);
 
-        
-        if (asiento < 0 || asiento > 10 || sala->asientos[num_horario][asiento-1] == 1) {
-            strcpy(buffer, "Invalido, escoga otro asiento\n");
+        if (asiento < 0 || asiento > 10 || sala->asientos[num_horario][asiento-1] == 1){
+            char b[20];
+            snprintf(b,sizeof(b), "Escoga otro asiento");
+            strcat(buffer_asiento,b);
             i--;
         } else {
-            strcpy(buffer, "El asiento ahora es suyo!\n");
-            asiento--;
+            char b[20];
+            snprintf(buffer_asiento,sizeof(b),"%s", "Asiento confirmado");
+            strcat(buffer_asiento,b);
+            asiento--;   
             sala->asientos[num_horario][asiento] = 1;
         }
+        send(client_socket, buffer_asiento, strlen(buffer_asiento), 0);
     }
 
     // Decrementa el número de cupos disponibles para el horario seleccionado

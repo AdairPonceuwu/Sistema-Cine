@@ -118,10 +118,22 @@ int main()
                 scanf("%d", &n_asiento);
                 snprintf(buffer, MAX_BUFFER_SIZE, "%d", n_asiento);
                 send(socket_c, buffer, strlen(buffer), 0);
-            }
+                //Recibir valor para comprobar
                 puente = recv(socket_c, buffer, MAX_BUFFER_SIZE, 0);
                 buffer[puente] = '\0';
                 printf("%s", buffer);
+                if(buffer == "Escoga otro asiento\n")
+                    i--;
+                /*if(recibe == "0"){
+                    printf("Opcion no disponible, digitela nuevamente\n");
+                    i--;
+                }else{
+                    printf("Asiento confirmado\n");
+                }*/
+            }
+            puente = recv(socket_c, buffer, MAX_BUFFER_SIZE, 0);
+            buffer[puente] = '\0';
+            printf("%s", buffer);
         }
 
         //Finalizar el sistema
